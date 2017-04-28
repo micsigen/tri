@@ -15,16 +15,18 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/micsigen/tri/cmd/todo"
-	"fmt"
+	"text/tabwriter"
+	"os"
+	"strconv"
 )
 
-var priority int
-
-// addCmd represents the add command
-var addCmd = &cobra.Command{
-	Use:   "add",
+// listCmd represents the list command
+var listCmd = &cobra.Command{
+	Use:   "list",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -35,32 +37,28 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		items, err := todo.ReadItems(cfgFile)
 		if err != nil {
-			fmt.Printf("%v", err)
+			fmt.Printf("%fv", err)
 		}
-		for _, x := range args {
-			item := todo.Item{}
-			item.Text = x
-			item.Priority = priority
-			items = append(items, item)
-		}
-		todo.SaveItems(cfgFile, items)
 
+		w := tabwriter.NewWriter(os.Stdout, 3, 0, 1, ' ', 0)
+		for _,i := range items {
+			fmt.Fprintln(w, strconv.Itoa(i.Priority)+"\t"+i.Text+"\t")
+		}
+		w.Flush()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(addCmd)
-
-	addCmd.Flags().IntVarP(&priority, "priority", "p", 2, "Priority: 1,2,3")
+	RootCmd.AddCommand(listCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 }

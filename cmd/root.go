@@ -20,6 +20,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/mitchellh/go-homedir"
+	"log"
 )
 
 var cfgFile string
@@ -55,10 +57,16 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.tri.yaml)")
+	home, err := homedir.Dir()
+	if err != nil {
+		log.Println("Unable to detect home directory. Please set data file using --datafile.")
+	}
+
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", home + string(os.PathSeparator) + ".tridos.json", "data to store todos")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
